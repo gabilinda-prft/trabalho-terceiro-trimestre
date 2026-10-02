@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sobreviva à Noite - Quiz de Terror</title>
+    <!-- Fonte Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <!-- CSS Externo -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <main class="app-container">
+        <!-- Tela Inicial -->
+        <section id="screen-start" class="screen active">
+            <h1 class="title">Sobreviva à Noite</h1>
+            <p class="description">
+                Ficaste preso numa mansão sombria e misteriosa. Cada decisão que tomares ditará o teu destino. Não existem escolhas certas ou erradas, apenas as consequências dos teus atos.
+            </p>
+            <div class="button-container">
+                <button class="btn btn-primary" onclick="startGame()">Entrar no Pesadelo</button>
+            </div>
+        </section>
+
+        <!-- Perguntas do Quiz -->
+        <section id="screen-question" class="screen">
+            <h1 id="question-title" class="title">Título da Pergunta</h1>
+            <p id="question-desc" class="description">Descrição da situação...</p>
+            <div class="button-container">
+                <button id="btn-opt1" class="btn btn-primary" onclick="selectOption(0)">Opção 1</button>
+                <button id="btn-opt2" class="btn btn-secondary" onclick="selectOption(1)">Opção 2</button>
+            </div>
+            <div class="progress-bar">
+                <div id="progress-fill" class="progress-fill"></div>
+            </div>
+        </section>
+
+        <!-- Tela de Resultado Final -->
+        <section id="screen-result" class="screen">
+            <h1 class="title">O Teu Destino Final</h1>
+            <div id="story-result" class="result-box">
+                <!-- Texto final gerado via JavaScript -->
+            </div>
+            <div class="footer-action">
+                <button class="btn btn-primary" onclick="restartGame()">Jogar Novamente</button>
+            </div>
+        </section>
+    </main>
+
+    <!-- JavaScript para a Lógica -->
+    <script>
+        const questions = [
+            {
+                title: "O Primeiro Suspiro na Escuridão",
+                desc: "A porta principal tranca-se atrás de ti e as luzes apagam-se subitamente. No escuro, ouves passos pesados no andar superior e ves uma ténue luz vinda da cave. Para onde vais?",
+                options: [
+                    { text: "Subir as escadas em direção aos passos.", effect: "enfrentar diretamente o perigo no andar superior" },
+                    { text: "Descer em direção à luz mistério da cave.", effect: "investigar a misteriosa iluminação da cave" }
+                ]
+            },
+            {
+                title: "A Descoberta no Corredor",
+                desc: "Encontras um diário antigo num móvel coberto de pó. Algumas páginas parecem ter sido arrancadas recentemente, enquanto uma gaveta trancada ao lado emite um tique-taque ritmado.",
+                options: [
+                    { text: "Ler atentamente o diário rasgado.", effect: "procurar pistas nos registos antigos do diário" },
+                    { text: "Tentar forçar a gaveta com tique-taque.", effect: "tentar abrir o mecanismo trancado na gaveta" }
+                ]
+            },
+            {
+                title: "A Presença Oculta",
+                desc: "Um sussurro gélido sopra no teu pescoço chamando pelo teu nome. Uma sombra disforme aproxima-se rapidamente pelo corredor.",
+                options: [
+                    { text: "Esconderes-te imediatamente dentro de um armário.", effect: "recorrer ao esconderijo no armário para evitar o contacto" },
+                    { text: "Correr sem olhar para trás em direção ao salão.", effect: "fugir em disparada pelo corredor escuro" }
+                ]
+            },
+            {
+                title: "O Dilema do Sobrevivente",
+                desc: "Vês outro sobrevivente preso numa jaula de ferro na cozinha. Ao mesmo tempo, encontras a chave de uma saída de emergência pendurada na parede oposta.",
+                options: [
+                    { text: "Usar o tempo para tentar libertar o sobrevivente.", effect: "priorizar o resgate do outro sobrevivente" },
+                    { text: "Pegar na chave e ir direto para a saída de emergência.", effect: "garantir a tua própria fuga imediatamente" }
+                ]
+            },
+            {
+                title: "O Confronto Final",
+                desc: "Diante da porta final para a liberdade, a entidade que habita a mansão bloqueia a passagem. Ela exige algo em troca da tua libertação.",
+                options: [
+                    { text: "Oferecer um objeto antigo que recolheste no caminho.", effect: "negociar a tua liberdade entregando o objeto relíquia" },
+                    { text: "Enfrentar a entidade usando a iluminação da lanterna.", effect: "usar a luz intensa para afastar a sombra e escapar" }
+                ]
+            }
+        ];
+
+        let currentQuestion = 0;
+        let selectedChoices = [];
+
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        function startGame() {
+            currentQuestion = 0;
+            selectedChoices = [];
+            loadQuestion();
+            showScreen('screen-question');
+        }
+
+        function loadQuestion() {
+            const q = questions[currentQuestion];
+            document.getElementById('question-title').innerText = q.title;
+            document.getElementById('question-desc').innerText = q.desc;
+            document.getElementById('btn-opt1').innerText = q.options[0].text;
+            document.getElementById('btn-opt2').innerText = q.options[1].text;
+
+            const progress = ((currentQuestion + 1) / questions.length) * 100;
+            document.getElementById('progress-fill').style.width = progress + '%';
+        }
+
+        function selectOption(index) {
+            const choice = questions[currentQuestion].options[index];
+            selectedChoices.push(choice.effect);
+
+            currentQuestion++;
+            if (currentQuestion < questions.length) {
+                loadQuestion();
+            } else {
+                finishGame();
+            }
+        }
+
+        function finishGame() {
+            const storyDiv = document.getElementById('story-result');
+           
+            let finalStory = `Ao longo da tua jornada no pesadelo, decidiste <strong>${selectedChoices[0]}</strong> e optar por <strong>${selectedChoices[1]}</strong>. <br><br>`;
+            finalStory += `Diante das ameaças iminentes, preferiste <strong>${selectedChoices[2]}</strong>. Mais tarde, num momento crucial, preferiste <strong>${selectedChoices[3]}</strong>. <br><br>`;
+            finalStory += `Por fim, o teu destino selou-se quando escolheste <strong>${selectedChoices[4]}</strong>.<br><br>`;
+            finalStory += `<span style="color: #38bdf8; font-weight: bold;">Resultado:</span> Consoante as tuas escolhas, conseguiste escapar da mansão, mas a memória desta noite sombria acompanhar-te-á para sempre.`;
+
+            storyDiv.innerHTML = finalStory;
+            showScreen('screen-result');
+        }
+
+        function restartGame() {
+            startGame();
+        }
+    </script>
+</body>
+</html>
